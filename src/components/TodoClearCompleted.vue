@@ -3,19 +3,17 @@
 </template>
   
 <script>
-		import mitt from 'mitt';
-    const emitter = mitt();
+		
   export default {
     name: 'TodoClearCompleted',
-    props: {
-      showClearCompletedButton: {
-        type: Boolean,
-        required: true,
+    computed: {
+      showClearCompletedButton() {
+        return this.$store.getters.showClearCompletedButton
       }
     },
     methods: {
       clearCompleted() {
-        emitter.emit('clearCompletedTodos')
+        this.$store.dispatch('clearCompleted')
       }
     }
   }

@@ -11,19 +11,17 @@
   </template>
   
   <script>
-  import {emitter} from '../utils/eventEmitter.js'
+
   export default {
     name: 'TodoCheckAll',
-    props: {
-      anyRemaining: {
-        type: Boolean,
-        required: true,
+    computed: {
+      anyRemaining() {
+       return this.$store.getters.anyRemaining
       }
     },
     methods: {
-      allChecked(event) {
-        
-        emitter.emit('checkAllChanged',event.target.checked)
+      allChecked() {
+        this.$store.dispatch('checkAll', event.target.checked)
       }
     }
   }

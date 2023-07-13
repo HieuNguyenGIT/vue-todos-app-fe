@@ -12,13 +12,17 @@
         v-focus>
       </div>
 
-      <div class="remove-item" @click="removeTodo(index)">
+     <div>
+      <button @click="pluralize">Plural</button>
+      <span class="remove-item" @click="removeTodo(index)">
         &times;
-      </div>
+      </span>
+     </div>
   </div>
 </template>
 
 <script >
+import {emitter} from '../utils/eventEmitter.js'
 export default {
     name: 'TodoItems',
     props: {
@@ -40,6 +44,12 @@ export default {
       'beforeEditCache': '',
       }
     },
+    created() {
+      emitter.on('pluralize', this.handlePluralize)
+    },
+    beforeUnmount() {
+      emitter.off('pluralize', this.handlePluralize)
+    },
     watch: {
       checkAll() {
         // if (this.checkAll) {
@@ -59,7 +69,7 @@ export default {
     },
     methods: {
       removeTodo(id) {
-        this.$emit('removedTodo', id)
+        this.$store.dispatch('deleteTodo', id)
       },
 
       editTodo() {
@@ -72,7 +82,7 @@ export default {
           this.title = this.beforeEditCache
         }
         this.editing = false
-        this.$emit('finishedEdit', {
+        this.$store.dispatch('updateTodo', {
           'id': this.id,
           'title': this.title,
           'completed': this.completed,
@@ -84,6 +94,23 @@ export default {
         this.title = this.beforeEditCache
         this.editing = false
       },
+
+      pluralize() {
+        emitter.emit('pluralize')
+      },
+
+      handlePluralize() {
+        let data = {
+          'id': this.id,
+          'title': this.title,
+          'completed': this.completed,
+          'editing': this.editing,
+        }
+        this.title = this.title + 's'
+        const index = this.$store.state.todos.findIndex((item) => item.id == data.id);
+				this.$store.state.todos.splice(index, 1, data)
+      }
+
     }
 }
 </script>

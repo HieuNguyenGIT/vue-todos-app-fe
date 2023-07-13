@@ -7,19 +7,16 @@
   </template>
   
   <script>
-    import mitt from 'mitt';
-    const emitter = mitt();
+
   export default {
     name: 'TodoFiltered',
-    data() {
-      return {
-        'filter': 'all',
-      }
+    computed() {
+      return this.$store.state.filter
     },
     methods: {
       changeFilter(filter) {
-        this.filter = filter
-        emitter.emit('filterChanged', filter)
+        this.$store.dispatch('updateFilter', filter)
+       
       }
     }
   }

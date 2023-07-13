@@ -18,48 +18,19 @@
 				@removedTodo="removeTodo" 
 				@finishedEdit="finishedEdit" 
 			/>
-				<!-- <div class="todo-item-left">
-					<input type="checkbox" v-model="todo.completed">
-					
-					<div v-if="!todo.editing" @dblclick="editTodo(todo)" class="todo-item-label" :class="{ completed : todo.completed }"> 
-						{{ todo.title }}
-					</div>
 
-					<input v-else class="todo-item-edit" type="text" 
-					v-model="todo.title" @blur="doneEdit(todo)" @keyup.enter="doneEdit(todo)"	@keyup.esc="cancelEdit(todo)" 
-					v-focus>
-				</div>
-
-				<div class="remove-item" @click="removeTodo(index)">
-					&times;
-				</div> -->
 		</transition-group>
 			<div class="extra-container">
-				<TodoCheckAll :anyRemaining="anyRemaining"/>
-				<TodoItemsRemaining :remaining="remaining"/>
-				<!-- <div>
-					<label>
-						<input type="checkbox" :checked="!anyRemaining" @change="checkAllTodos"> 
-							Check All
-						</label>
-				</div>
-				<div>{{ remaining }} items left</div> -->
+				<TodoCheckAll/>
+				<TodoItemsRemaining/>
 			</div>
 
 			<div class="extra-container">
 				<TodoFiltered/>
-				<!-- <div>
-					<button :class="{ active: filter == 'all' }" @click="filter = 'all'">All</button>
-						<button :class="{ active: filter == 'active' }" @click="filter = 'active'">Active</button>
-					<button :class="{ active: filter == 'completed' }" @click="filter = 'completed'">Completed</button>
-				</div> -->
 
 				<div>
 					<transition name="fade">
-						<TodoClearCompleted :showClearCompletedButton="showClearCompletedButton"/>
-						<!-- <button v-if="showClearCompletedButton" @click="clearCompleted">
-							Clear Completed
-						</button> -->
+						<TodoClearCompleted />
 					</transition>
 				</div>
 
@@ -73,96 +44,56 @@ import TodoFiltered from '../components/TodoFiltered.vue'
 import TodoItemsRemaining from '../components/TodoItemsRemaining.vue'
 import TodoCheckAll from '../components/TodoCheckAll.vue'
 import TodoClearCompleted from '../components/TodoClearCompleted.vue'
+//import {emitter} from '../utils/eventEmitter.js';
+
 </script>
+
 <script>
-	//import TodoItems from '../components/TodoItems.vue'
-	import {emitter} from '../utils/eventEmitter.js'
-	import Testy from '../components/Testy.vue'
+
 	export default {
 	name: "TodoList",
-	component: {
-		//TodoItems,
-		Testy
-	},
 	data() {
 			return {
 					newTodo: "",
 					idForTodo: 3,
-					beforeEditCache: "st is wrong this this anti empty string method",
-					filter: "all",
-					todos: [
-							{
-									"id": 1,
-									"title": "Learn vue with the flame of ambition",
-									"completed": false,
-									"editing": false,
-							},
-							{
-									"id": 2,
-									"title": "put those foolish ambition to rest",
-									"completed": false,
-									"editing": false,
-							}
-					]
+					beforeEditCache: "st is wrong this anti empty string method",	
 			};
 	},
-	created() {
-		emitter.on('removedTodo', (id) => this.removeTodo(id))
-		emitter.on('finishedEdit', (data) => this.finishedEdit(data))
-		emitter.on('checkAllChanged', (checked) => this.checkAllTodos(checked))
-		emitter.on('filterChanged', (filter) => this.filter = filter)
-		emitter.on('clearCompletedTodos', () => this.clearCompleted())
-},
-	beforeUnmount() {
-		emitter.off('removedTodo')
-		emitter.off('finishedEdit')
-		emitter.off('checkAllChanged')
-		emitter.off('filterChanged')
-		emitter.off('clearCompletedTodos')
-	},
+// 	created() {
+// 		emitter.on('removedTodo', (id) => this.removeTodo(id))
+// 		emitter.on('finishedEdit', (data) => this.finishedEdit(data))
+// 		emitter.on('checkAllChanged', (checked) => this.checkAllTodos(checked))
+// 		emitter.on('filterChanged', (filter) => this.$store.state.filter = filter)
+// 		emitter.on('clearCompletedTodos', () => this.clearCompleted())
+// },
+// 	beforeUnmount() {
+// 		emitter.off('removedTodo')
+// 		emitter.off('finishedEdit')
+// 		emitter.off('checkAllChanged')
+// 		emitter.off('filterChanged')
+// 		emitter.off('clearCompletedTodos')
+// 	},
 	computed: {
-			// used for composing new data from other data
-			// shouldn not mutate data
-			// should not accept parameter
-			// always return st
-			remaining() {
-					return this.todos.filter(todo => !todo.completed).length;
-			},
+			// used for composing new data from other data should not mutate data
+			// should not accept parameter  and always return st
 			anyRemaining() {
-					return this.remaining != 0;
+				return this.$store.getters.anyRemaining
 			},
 			todosFiltered() {
-					if (this.filter == "all") {
-						return this.todos;
-					}
-					else if (this.filter == "active") {
-						return this.todos.filter(todo => !todo.completed);
-					}
-					else if (this.filter == "completed") {
-						return this.todos.filter(todo => todo.completed);
-					}
-					return this.todos;
+				return this.$store.getters.todosFiltered
 			},
-			showClearCompletedButton() {
-					return this.todos.filter(todo => todo.completed).length > 0;
-			}
 	},
 	methods: {
 			addTodo() {
 					if (this.newTodo.trim() == 0) {
 							return;
 					}
-					this.todos.push({
-							id: this.idForTodo,
-							title: this.newTodo,
-							completed: false,
-					});
+					this.$store.dispatch('addTodo', {
+						id: this.idForTodo,
+						title: this.newTodo,
+					})
 					this.newTodo = "";
 					this.idForTodo++;
-			},
-			removeTodo(id) {
-				const index = this.todos.findIndex((item) => item.id == id)
-				this.todos.splice(index, 1);
 			},
 			editTodo(todo) {
 				todo.beforeEditCache = this.title;
@@ -178,22 +109,14 @@ import TodoClearCompleted from '../components/TodoClearCompleted.vue'
 				todo.title = this.beforeEditCache;
 				todo.editing = false;
 			},
-			checkAllTodos(checked) {
-				console.log('cheking')
-				this.todos.forEach((todo) => todo.completed = checked);
-			},
-			// clearCompleted() {
-			// 	this.todos = this.todos.filter(todo => !todo.completed);
-			// },
 			finishedEdit(data) {
-				const index = this.todos.findIndex((item) => item.id == data.id);
-				this.todos.splice(index, 1, data)
+				const index = this.$store.state.todos.findIndex((item) => item.id == data.id);
+				this.$store.state.todos.splice(index, 1, data)
 			}
 	},
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
 	@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css");
 	
