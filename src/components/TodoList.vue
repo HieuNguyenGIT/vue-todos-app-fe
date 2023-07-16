@@ -45,7 +45,13 @@ import TodoItemsRemaining from '../components/TodoItemsRemaining.vue'
 import TodoCheckAll from '../components/TodoCheckAll.vue'
 import TodoClearCompleted from '../components/TodoClearCompleted.vue'
 //import {emitter} from '../utils/eventEmitter.js';
+// import {getAllTodos} from '../utils/apiConnector.js'
 
+// getAllTodos().then((result)=>{
+// 	console.log(result);
+// }).catch((err)=>{
+// 	console.error('error:', err);
+// })
 </script>
 
 <script>
@@ -59,20 +65,7 @@ import TodoClearCompleted from '../components/TodoClearCompleted.vue'
 					beforeEditCache: "st is wrong this anti empty string method",	
 			};
 	},
-// 	created() {
-// 		emitter.on('removedTodo', (id) => this.removeTodo(id))
-// 		emitter.on('finishedEdit', (data) => this.finishedEdit(data))
-// 		emitter.on('checkAllChanged', (checked) => this.checkAllTodos(checked))
-// 		emitter.on('filterChanged', (filter) => this.$store.state.filter = filter)
-// 		emitter.on('clearCompletedTodos', () => this.clearCompleted())
-// },
-// 	beforeUnmount() {
-// 		emitter.off('removedTodo')
-// 		emitter.off('finishedEdit')
-// 		emitter.off('checkAllChanged')
-// 		emitter.off('filterChanged')
-// 		emitter.off('clearCompletedTodos')
-// 	},
+
 	computed: {
 			// used for composing new data from other data should not mutate data
 			// should not accept parameter  and always return st

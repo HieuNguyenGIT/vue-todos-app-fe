@@ -1,5 +1,8 @@
 
 import { createStore } from 'vuex'
+import axios from 'axios'
+
+axios.defaults.baseURL= 'http://travellisttest/api';
 
  const store = createStore({
     state: {
@@ -71,6 +74,15 @@ import { createStore } from 'vuex'
           state.filter = filter
         },
         clearCompleted(state) {
+          axios.get('/todos').then(
+            response => {
+              console.log(response);
+            }
+          ).catch(
+            error =>{
+              console.log(error)
+            }
+          )
           state.todos = state.todos.filter(todo => !todo.completed)
         }
       },
