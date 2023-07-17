@@ -10,11 +10,10 @@
 
 		<transition-group name="fade" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
 			<TodoItems
-				v-for="(todo,index) in todosFiltered" 
+				v-for="(todo) in todosFiltered" 
 				:checkAll="!anyRemaining" 
 				:key="todo.id" 
 				:todo="todo" 
-				:index="index"
 				@removedTodo="removeTodo" 
 				@finishedEdit="finishedEdit" 
 			/>
@@ -65,7 +64,9 @@ import TodoClearCompleted from '../components/TodoClearCompleted.vue'
 					beforeEditCache: "st is wrong this anti empty string method",	
 			};
 	},
-
+	created(){
+		this.$store.dispatch('retrieveTodos')
+	},
 	computed: {
 			// used for composing new data from other data should not mutate data
 			// should not accept parameter  and always return st
@@ -88,24 +89,7 @@ import TodoClearCompleted from '../components/TodoClearCompleted.vue'
 					this.newTodo = "";
 					this.idForTodo++;
 			},
-			editTodo(todo) {
-				todo.beforeEditCache = this.title;
-				todo.editing = true;
-			},
-			doneEdit(todo) {
-				if (todo.title.trim() == "") {
-						todo.title = this.beforeEditCache;
-				}
-				todo.editing = false;
-			},
-			cancelEdit(todo) {
-				todo.title = this.beforeEditCache;
-				todo.editing = false;
-			},
-			finishedEdit(data) {
-				const index = this.$store.state.todos.findIndex((item) => item.id == data.id);
-				this.$store.state.todos.splice(index, 1, data)
-			}
+			
 	},
 }
 </script>

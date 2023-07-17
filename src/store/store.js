@@ -8,18 +8,7 @@ axios.defaults.baseURL= 'http://travellisttest/api';
     state: {
       filter: 'all',
       todos: [
-        {
-          'id': 1,
-          'title': 'Finish Vue Screencast',
-          'completed': false,
-          'editing': false,
-        },
-        {
-          'id': 2,
-          'title': 'Take over world',
-          'completed': false,
-          'editing': false,
-        },
+        
       ]
     },
     // 
@@ -74,38 +63,68 @@ axios.defaults.baseURL= 'http://travellisttest/api';
           state.filter = filter
         },
         clearCompleted(state) {
+          state.todos = state.todos.filter(todo => !todo.completed)
+        },
+        retrieveTodos(state, todos) {
+          state.todos = todos
+        }
+      },
+      actions: {
+        retrieveTodos(context){
           axios.get('/todos').then(
             response => {
-              console.log(response);
+              context.commit('retrieveTodos', response.data)
             }
           ).catch(
             error =>{
               console.log(error)
             }
           )
-          state.todos = state.todos.filter(todo => !todo.completed)
-        }
-      },
-      actions: {
+        },
         addTodo(context, todo) {
-          setTimeout(() => {
-            context.commit('addTodo', todo)
-          }, 100)
+          axios.post('/todos', {
+            title: todo.title,
+            completed: false,
+          })
+            .then(response => {
+              context.commit('addTodo', response.data)
+            })
+            .catch(error => {
+              console.log(error)
+            })
         },
         updateTodo(context, todo) {
-          setTimeout(() => {
-            context.commit('updateTodo', todo)
-          }, 100)
+          axios.patch('/todos/' + todo.id, {
+            title: todo.title,
+            completed: todo.completed,
+          })
+            .then(response => {
+              console.log('updateTodo aaa', response.data)
+              context.commit('updateTodo', response.data)
+            })
+            .catch(error => {
+              console.log(error)
+            })
         },
         deleteTodo(context, id) {
-          setTimeout(() => {
-            context.commit('deleteTodo', id)
-          }, 100)
+          axios.delete('/todos/' + id)
+          .then(response => {
+            context.commit('deleteTodo', response.data.id)
+          })
+          .catch(error => {
+            console.log(error)
+          })
         },
         checkAll(context, checked) {
-          setTimeout(() => {
-            context.commit('checkAll', checked)
-          }, 100)
+          axios.patch('/todosCheckAll', {
+            completed: checked,
+          })
+            .then(response => {
+              context.commit('checkAll', response.data.checked)
+            })
+            .catch(error => {
+              console.log(error)
+            })
         },
         updateFilter(context, filter) {
           setTimeout(() => {
@@ -113,9 +132,21 @@ axios.defaults.baseURL= 'http://travellisttest/api';
           }, 100)
         },
         clearCompleted(context) {
-          setTimeout(() => {
-            context.commit('clearCompleted')
-          }, 100)
+          const completed = context.state.todos
+        .filter(todo => todo.completed)
+        .map(todo => todo.id)
+
+        axios.delete('/todosDeleteMultiple', {
+          data: {
+            todos: completed
+          }
+        })
+          .then(response => {
+            context.commit('clearCompleted',response)
+          })
+          .catch(error => {
+            console.log(error)
+          })
         }
       }
   })
